@@ -37,11 +37,24 @@ class Transport(Command):
 
         return conn
 
-    def screencap(self):
+    def screencap(self, id=0):
         conn = self.create_connection()
 
         with conn:
-            cmd = "shell:/system/bin/screencap -p"
+            cmd = "shell:dumpsys SurfaceFlinger --display-id"
+            conn.send(cmd)
+            result = conn.read_all().decode('utf-8')
+            dids = []
+            for line in result.split('\n'):
+                if 'Display' in line:
+                    dids.append(line.split(' ')[1])
+            if id > len(dids):
+                id = len(dids)-1
+
+        conn = self.create_connection()
+
+        with conn:
+            cmd = f"shell:/system/bin/screencap -p -d {dids[id]}"
             conn.send(cmd)
             result = conn.read_all()
 
