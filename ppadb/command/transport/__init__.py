@@ -79,17 +79,17 @@ class Transport(Command):
         raise NotImplemented()
 
     def list_features(self):
-        result = self.shell("pm list features 2>/dev/null")
+        if not len(self.features()):
+            result = self.shell("pm list features 2>/dev/null")
 
-        result_pattern = "^feature:(.*?)(?:=(.*?))?\r?$"
-        features = {}
-        for line in result.split('\n'):
-            m = re.match(result_pattern, line)
-            if m:
-                value = True if m.group(2) is None else m.group(2)
-                features[m.group(1)] = value
+            result_pattern = "^feature:(.*?)(?:=(.*?))?\r?$"
+            for line in result.split('\n'):
+                m = re.match(result_pattern, line)
+                if m:
+                    value = True if m.group(2) is None else m.group(2)
+                    self.features[m.group(1)] = value
 
-        return features
+        return self.features
 
     def list_packages(self):
         result = self.shell("pm list packages 2>/dev/null")
@@ -104,16 +104,16 @@ class Transport(Command):
         return packages
 
     def get_properties(self):
-        result = self.shell("getprop")
-        result_pattern = "^\[([\s\S]*?)\]: \[([\s\S]*?)\]\r?$"
+        if not len(self.properties):
+            result = self.shell("getprop")
+            result_pattern = "^\[([\s\S]*?)\]: \[([\s\S]*?)\]\r?$"
 
-        properties = {}
-        for line in result.split('\n'):
-            m = re.match(result_pattern, line)
-            if m:
-                properties[m.group(1)] = m.group(2)
+            for line in result.split('\n'):
+                m = re.match(result_pattern, line)
+                if m:
+                    self.properties[m.group(1)] = m.group(2)
 
-        return properties
+        return self.properties
 
     def list_reverses(self):
         conn = self.create_connection()

@@ -11,6 +11,9 @@ def dump_logcat(connection):
 
 client = AdbClient(host="127.0.0.1", port=5037)
 
+from test_host import test_list_devices
+from test_device import test_get_properties
+
 devices = client.devices()
 serials = [device.serial for device in devices]
 for device in devices:
@@ -21,9 +24,18 @@ for device in devices:
     print(f'Top Activity: {device.get_top_activity()}')
     print(f'CPU counts: {device.cpu_count()}')
     features = device.list_features()
-    for feature in features:
-        print(f'{feature}: {features[feature]}')
-    device.shell('logcat', handler=dump_logcat)
+    # for feature in features:
+    #     print(f'{feature}: {features[feature]}')
+    # device.shell('logcat', handler=dump_logcat)
+    test_list_devices(client, device.serial)
+    properties = device.get_properties()
+    # for prop in properties:
+    #     print(f'{prop}: {properties[prop]}')
 
-for serial in serials:
-    print(serial, client.device(serial).serial)
+    print(f'model:', properties['ro.product.model'])
+    print(f'manufacturer:', properties['ro.product.manufacturer'])
+    print(f'model:', properties['ro.product.model'])
+    print(f'manufacturer:', properties['ro.product.manufacturer'])
+
+# for serial in serials:
+#     print(serial, client.device(serial).serial)
