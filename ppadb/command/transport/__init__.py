@@ -10,6 +10,9 @@ logger = AdbLogging.get_logger(__name__)
 
 
 class Transport(Command):
+    def __init__(self):
+        self.properties = {}
+        
     def transport(self, connection):
         cmd = "host:transport:{}".format(self.serial)
         connection.send(cmd)
@@ -79,7 +82,7 @@ class Transport(Command):
         raise NotImplemented()
 
     def list_features(self):
-        if not len(self.features()):
+        if not len(self.features):
             result = self.shell("pm list features 2>/dev/null")
 
             result_pattern = "^feature:(.*?)(?:=(.*?))?\r?$"
@@ -103,7 +106,7 @@ class Transport(Command):
 
         return packages
 
-    def get_properties(self):
+    def list_properties(self):
         if not len(self.properties):
             result = self.shell("getprop")
             result_pattern = "^\[([\s\S]*?)\]: \[([\s\S]*?)\]\r?$"

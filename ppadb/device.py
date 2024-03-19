@@ -37,6 +37,8 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
     def __init__(self, client, serial):
         self.client = client
         self.serial = serial
+        self.properties = {}
+        self.features = {}
 
     def create_connection(self, set_transport=True, timeout=None):
         conn = self.client.create_connection(timeout=timeout)
