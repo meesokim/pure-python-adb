@@ -29,16 +29,21 @@ try:
 except ImportError:
     from pipes import quote as cmd_quote
 
-
+import os
 class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats):
     INSTALL_RESULT_PATTERN = "(Success|Failure|Error)\s?(.*)"
     UNINSTALL_RESULT_PATTERN = "(Success|Failure.*|.*Unknown package:.*)"
 
     def __init__(self, client, serial):
+        APK_ROOT = 'MUSCAT_APK_ROOT'
         self.client = client
         self.serial = serial
         self.properties = {}
         self.features = {}
+        if APK_ROOT in os.environ:
+            self.root = os.environ[APK_ROOT]
+        else:
+            self.root = '.'
 
     def create_connection(self, set_transport=True, timeout=None):
         conn = self.client.create_connection(timeout=timeout)
@@ -94,7 +99,7 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
                 grand_all_permissions=False  # -g
                 ):
         dest = Sync.temp(path)
-        self.push(path, dest)
+        self.push(f'{self.root}/{path}', dest)
 
         parameters = []
         if forward_lock: parameters.append("-l")
@@ -114,9 +119,9 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
                 return True
             elif match:
                 groups = match.groups()
-                raise InstallError(dest, groups[1])
+                return InstallError(dest, groups[1])
             else:
-                raise InstallError(dest, result)
+                return InstallError(dest, result)
         finally:
             self.shell("rm -f {}".format(dest))
 
@@ -141,3 +146,6 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
         else:
             logger.error("There is no message after uninstalling")
             return False
+
+    def set_apk_path(self, path):
+        self.root = path
