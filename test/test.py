@@ -54,5 +54,6 @@ for device in devices:
     device.uninstall('com.sec.android.spa_automation')
     device.uninstall('com.sec.android.spa_automation.test')
     device.install('/auto_apk/spa-testcase.apk')
+    device.install('/gos_apk/GosTester-3.6.00.7-debug.apk')
 # for serial in serials:
 #     print(serial, client.device(serial).serial)
