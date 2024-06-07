@@ -41,9 +41,9 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
         self.properties = {}
         self.features = {}
         if APK_ROOT in os.environ:
-            self.root = os.environ[APK_ROOT]
+            self.ROOT = os.environ[APK_ROOT]
         else:
-            self.root = '.'
+            self.ROOT = '.'
 
     def create_connection(self, set_transport=True, timeout=None):
         conn = self.client.create_connection(timeout=timeout)
@@ -99,7 +99,7 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
                 grand_all_permissions=False  # -g
                 ):
         dest = Sync.temp(path)
-        self.push(f'{self.root}/{path}', dest)
+        self.push(f'{self.ROOT}/{path}', dest)
 
         parameters = []
         if forward_lock: parameters.append("-l")
@@ -148,4 +148,4 @@ class Device(Transport, Serial, Input, Utils, WM, Traffic, CPUStat, BatteryStats
             return False
 
     def set_apk_path(self, path):
-        self.root = path
+        self.ROOT = path
